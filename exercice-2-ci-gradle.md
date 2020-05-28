@@ -80,26 +80,7 @@ task tarball(type:Exec) {
 * * task vendor : utilise composer pour aller chercher les dépendances de notre projet
 * * distribution permet de choisir les fichier à packager, le nom du package, c'est ce pagckage qui est appeler avec la commande gradle applicationDistTar
 * * task tarball permet de choisir le format et la destination de sortie
-* Pour éxecuter le build, il faut se connecter sur la machine docker
-* Récupérer l'id ou le nom de la machine avec 
-```
-docker ls
-```
-* Se connecter sur la machine :
-```
-docker exec -ti [IDDELAMACHINE] sh
-```
-* Lister les taches du build
-```
-gradle tasks
-```
-* Lancer les taches
-```
-gradle purge
-gradle composer
-gradle vendor
-gradle tarball
-```
+* Pour éxecuter le build, il faut relancer le build avec la commande docker build utiliser auparavant
 * Il est nécessaire de lancer les taches une par une, ce qui est un peu fastidieux
 * Pour éviter ça on rajoute des dépendances entre les taches :
 ```
