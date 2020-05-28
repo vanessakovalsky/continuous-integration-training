@@ -13,17 +13,12 @@ https://docs.docker.com/compose/install/
 ## Exemple de build avec un projet PHP
 * Si ce n'est pas fait récupérer le code source de votre projet, ici :
 ```
-git clone https://github.com/vanessakovalsky/laravel-kingoludo.git
+git clone https://github.com/vanessakovalsky/laravel-kingoludo.git project
 ```
-* Lancement du conteneur docker:
+* Build et Lancement du conteneur docker:
 ```
-docker run -d -i -t -v "$PWD":/home/gradle/project -w /home/gradle/project gradle
+docker build --tag my-gradle .
 ```
-* Pour vérifier que votre conteneur fonctionne :
-```
-docker ls
-```
-* Votre conteneur utilisant gradle doit apparaitre dans la liste
 * Dans votre IDE, créer à la racine du projet un fichier build.gradle contenant :
 ```
 apply plugin: "distribution"
@@ -83,7 +78,7 @@ task tarball(type:Exec) {
 * * task purge : supprimer les anciens fichiers pour éviter les conflit
 * * task composer : installe la dernière version de composer 
 * * task vendor : utilise composer pour aller chercher les dépendances de notre projet
-* * distribution permet de choisir les fichier à packager
+* * distribution permet de choisir les fichier à packager, le nom du package, c'est ce pagckage qui est appeler avec la commande gradle applicationDistTar
 * * task tarball permet de choisir le format et la destination de sortie
 * Pour éxecuter le build, il faut se connecter sur la machine docker
 * Récupérer l'id ou le nom de la machine avec 
@@ -92,7 +87,7 @@ docker ls
 ```
 * Se connecter sur la machine :
 ```
-docker exec [IDDELAMACHINE] sh
+docker exec -ti [IDDELAMACHINE] sh
 ```
 * Lister les taches du build
 ```

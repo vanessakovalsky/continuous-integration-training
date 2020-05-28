@@ -1,4 +1,12 @@
 apply plugin: "distribution"
+apply plugin: 'maven'
+apply plugin: "maven-publish"
+
+repositories {
+    maven {
+          url "http://localhost:8081/nexus/content/groups/public"
+    }
+}
 
 def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
 def minorVersion = System.getenv("MINOR_VERSION") ?: "0"
@@ -48,4 +56,21 @@ task tarball(type:Exec) {
   //println 'Compressing tar'
   executable 'sh'
   args '-c', "gzip -f < " + tarfile + ".tar > " + tarfile + ".tgz"
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact source: tarball, extension: 'zip'
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username nexusUsername
+                password nexusPassword
+            }
+            url nexusRepo
+        }
+    }
 }

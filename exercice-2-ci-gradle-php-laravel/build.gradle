@@ -4,7 +4,7 @@ def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
 def minorVersion = System.getenv("MINOR_VERSION") ?: "0"
 version = majorVersion + "." + minorVersion 
 
-task purge << {
+task purge(type:Delete) {
   //println 'Cleaning up old files'
   delete 'vendor', 'logs', 'build', 'composer.phar'
 }
@@ -43,7 +43,7 @@ distributions {
     }
   }
 }
-def tarfile = "build/distributions/application-" + version
+def tarfile = "/application-" + version
 task tarball(type:Exec) {
   //println 'Compressing tar'
   executable 'sh'
