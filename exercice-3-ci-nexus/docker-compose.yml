@@ -1,0 +1,14 @@
+version: '3'
+services:
+  gradle:
+    volumes:
+      - ~/:/home/gradle/src
+    image: gradle
+    container_name: gradle
+  nexus:
+    volumes:
+      - ~/nexus-data:/nexus-data
+    ports:
+      - "8081:8081"
+    image: sonatype/nexus
+    container_name: nexus

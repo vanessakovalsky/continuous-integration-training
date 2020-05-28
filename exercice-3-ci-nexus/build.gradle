@@ -1,0 +1,51 @@
+apply plugin: "distribution"
+
+def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
+def minorVersion = System.getenv("MINOR_VERSION") ?: "0"
+version = majorVersion + "." + minorVersion 
+
+task purge << {
+  //println 'Cleaning up old files'
+  delete 'vendor', 'logs', 'build', 'composer.phar'
+}
+task composer(type:Exec) {
+  //println 'Setting up dependencies'
+  executable 'sh'
+  args '-c', 'php -r "readfile(\'https://getcomposer.org/installer\');" | php'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
+}
+task vendor(type:Exec) {
+  //println 'Installing dependencies'
+  executable 'sh'
+  args '-c', 'php composer.phar install'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
+}
+
+distributions {
+  application {
+    baseName = 'application'
+    contents {
+      from ('app') { into 'app' }
+      from ('bootstrap') { into 'bootstrap' }
+      from ('config') { into 'config' }
+      from ('database') { into 'database' }
+      from ('nbproject') { into 'nbproject' }
+      from ('public') { into 'public' }
+      from ('resources') { into 'resources' }
+      from ('storage') {
+        into 'storage'
+        dirMode 0775
+      }
+      from ('vendor') { into 'vendor' }
+      from { 'server.php' }
+    }
+  }
+}
+def tarfile = "build/distributions/application-" + version
+task tarball(type:Exec) {
+  //println 'Compressing tar'
+  executable 'sh'
+  args '-c', "gzip -f < " + tarfile + ".tar > " + tarfile + ".tgz"
+}

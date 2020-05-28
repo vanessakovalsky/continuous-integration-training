@@ -132,3 +132,6 @@ https://docs.gradle.org/current/userguide/userguide.html
 ## Créer un build pour votre propre projet
 * Définisser l'ensemble des actions nécessaires pour builder votre projet
 * créer un build.gradle qui décrit ses taches en utilisant les plugins de gradle si nécessaire : https://plugins.gradle.org/ 
+
+-> Pour aller plus loin d'autres exercices sont disponible ici : 
+https://github.com/praqma-training/gradle-katas
