@@ -1,3 +1,15 @@
+buildscript {
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.org.swissphpfriends:php-build-plugin:0.1-SNAPSHOT"
+  }
+}
+
+apply plugin: "org.hasnat.php-build-plugin"
 apply plugin: "distribution"
 
 def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
@@ -6,46 +18,31 @@ version = majorVersion + "." + minorVersion
 
 task purge(type:Delete) {
   //println 'Cleaning up old files'
-  delete 'vendor', 'logs', 'build', 'composer.phar'
-}
-task composer(type:Exec, dependsOn: purge) {
-  //println 'Setting up dependencies'
-  executable 'sh'
-  args '-c', 'php -r "readfile(\'https://getcomposer.org/installer\');" | php'
-  standardOutput = new ByteArrayOutputStream()
-  ext.output = { return standardOutput.toString() }
-}
-task vendor(type:Exec, dependsOn: composer) {
-  //println 'Installing dependencies'
-  executable 'sh'
-  args '-c', 'php composer.phar install'
-  standardOutput = new ByteArrayOutputStream()
-  ext.output = { return standardOutput.toString() }
+  delete 'vendor', 'logs', 'build'
 }
 
-distributions {
-  application {
-    baseName = 'application'
-    contents {
-      from ('app') { into 'app' }
-      from ('bootstrap') { into 'bootstrap' }
-      from ('config') { into 'config' }
-      from ('database') { into 'database' }
-      from ('nbproject') { into 'nbproject' }
-      from ('public') { into 'public' }
-      from ('resources') { into 'resources' }
-      from ('storage') {
+task installDeps(type: org.swissphpfriends.gradle.task.ComposerInstall) {
+    workingDirectory = "./project"
+    doNotUpdatePhar = true
+}
+
+
+def tarfile = "application-" + version
+task packageDistribution(type: Zip, dependsOn: installDeps) {
+    archiveFileName = tarfile + ".zip"
+    destinationDirectory = file("project/build")
+
+    from ('project/app') { into 'app' }
+    from ('project/bootstrap') { into 'bootstrap' }
+    from ('project/config') { into 'config' }
+      from ('project/database') { into 'database' }
+      from ('project/nbproject') { into 'nbproject' }
+      from ('project/public') { into 'public' }
+      from ('project/resources') { into 'resources' }
+      from ('project/storage') {
         into 'storage'
         dirMode 0775
       }
-      from ('vendor') { into 'vendor' }
-      from { 'server.php' }
-    }
-  }
-}
-def tarfile = "/application-" + version
-task tarball(type:Exec, dependsOn: vendor, applicationDistTar) {
-  //println 'Compressing tar'
-  executable 'sh'
-  args '-c', "gzip -f < " + tarfile + ".tar > " + tarfile + ".tgz"
+      from ('project/vendor') { into 'vendor' }
+      from { 'project/server.php' }
 }
