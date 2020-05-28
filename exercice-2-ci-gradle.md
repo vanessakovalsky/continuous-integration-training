@@ -84,7 +84,7 @@ task tarball(type:Exec) {
 * Il est nécessaire de lancer les taches une par une, ce qui est un peu fastidieux
 * Pour éviter ça on rajoute des dépendances entre les taches :
 ```
-task purge << {
+task purge (type:Delete) {
     [...]
 }
 task composer(type:Exec, dependsOn: purge) {
@@ -94,13 +94,13 @@ task vendor(type:Exec, dependsOn: composer) {
     [...]
 }
 [...]
-task tarball(type:Exec, dependsOn: vendor) {
+task tarball(type:Exec, dependsOn: vendor, applicationDistTar) {
     [...]
 }
 ```
-* Lorsque nous lançons seulement la dernière tâche, l'ensemble des autres taches se lançent également avec l'arbre de dépendance :
+* Mofidier le fichier Docker file pour appeler seulement la dernière tache :
 ```
-gradle tarball
+RUN gradle tarball --no-demon --info
 ```
 * Pour découvrir l'ensemble des options, aller voir la documentation de gradle :
 https://docs.gradle.org/current/userguide/userguide.html 
