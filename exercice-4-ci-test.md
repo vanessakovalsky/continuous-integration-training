@@ -6,11 +6,14 @@ Cet exercice va permettre d'executer les tests de manières automatisés avant l
 * POur les lancers nous utilisons PHPUnit
 * Pour cela on ajoute une tache dans le build.gradle qui va se charger de lancer les tests
 ```
-task test(type: org.swissphpfriends.gradle.task.PhpUnit) {
-    path = "./project"
-    verbose = true
-    outputTap = true
-    configurationFile = "/project/phpunit.xml"
+task test(type:Exec, dependsOn: installDeps) {
+  //println 'Executing tests'
+  executable 'sh'
+  args '-c', "php \
+    './project/vendor/phpunit/phpunit/phpunit' \
+    --configuration='./project/phpunit.xml' \
+    --log-junit='./logs/unitreport.xml'\
+    ./project/tests"
 }
 ```
 

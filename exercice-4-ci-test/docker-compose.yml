@@ -1,0 +1,16 @@
+version: '3'
+services:
+  gradle:
+    build: ./
+    #image: gradle
+    container_name: gradle
+  nexus:
+    volumes:
+      - nexus-data:/nexus-data
+    #Avoid conflict with macAffee which using port 8081 and 8082
+    ports:
+      - "8099:8081"
+    image: sonatype/nexus3
+    container_name: nexus
+volumes:
+  nexus-data: {}
