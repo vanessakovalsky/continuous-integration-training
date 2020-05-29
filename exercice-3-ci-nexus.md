@@ -13,57 +13,49 @@ docker-compose up -d
 ```
 docker-compose ps 
 ```
+* Nexus prend quelque minutes à démarrer complètement, pour vérifier utiliser :
+```
+docker logs -f nexus
+```
+* Cette commande doit afficher :
+```
+Started Sonatype Nexus OSS 3.23.0-03
+```
 * Une fois les conteneurs lancés, nexus est accessible à l'url :
-http://localhost:8081
-* Se connecter (login : admin, pass : admin123)
+http://localhost:8099
+* Récupérer le mot de passe (dans un terminal) :
+```
+docker exec -t -i nexus sh
+cat nexus-data/admin.password
+```
+* Noter le mot de passe afficher
+* Se connecter (login : admin, pass : (récupérer à l'étape précédente))
+* Suivre les 4 étapes de configuration
 * Quels sont les différents repositories existants ?
 * Créer un repository de type Hosted Repository, qui nous servira à déposer nos builds
 
 ## Utilisation de nexus sur un projet PHP
-* Nous allons utiliser notre repository de deux façons :
-* * En tant que proxy pour composer
-* * Pour publier les archives de notre application
-
-### Utilisation de Nexus en tant que proxy pour composer 
-* Installer le plugin composer pour nexus :
-https://github.com/sonatype-nexus-community/nexus-repository-composer
-* Créer un repository proxy dans Nexus pour composer
-* Définir un cron pour récupérer les paquets périodiquement depuis le dépôt officiel
+* Nous allons utiliser notre repository pour publier les archives de notre application
+* Il est indispensable de récupérer l'IP du container Nexus, pour cela on utilise docker network inspect qui permet d'avoir des informations sur le réseau :
 ```
-*/5 * * * * php /apps/satis2nexus/bin/satis build --no-interaction /apps/satis2nexus/satis.json /apps/satis2nexus_build/
-*/10 * * * * php /apps/satis2nexus/bin/satis purge --no-interaction /apps/satis2nexus/satis.json /apps/satis2nexus_build/
+docker network inspect 
 ```
-* Ajouter dans le fichier build.gradle les informations sur le repository (adapter l'url à votre repository)
-```
-apply plugin: 'maven'
-
-repositories {
-    maven {
-          url "http://localhost:8081/nexus/content/groups/public"
-    }
-}
-```
-* Le repository a été ajouté, il ne reste plus qu'à relancer le build
-```
-gradle tarball
-```
-
-### Déposer l'archive zip dans Nexus
+* Dans les lignes affichés, on cherche Nexus et la ligne contenant IP/V4
 * Créer un fichier gradle.properties à la racine du projet, il contient les informations de connexion
 ```
 # Maven repository for publishing artifacts
-nexusRepo=http://privatenexus/content/repositories/releases
-nexusUsername=admin_user
-nexusPassword=admin_password
+nexusRepo=172.22.0.3:8081/repository/maven-releases/
 ```
 * Dans le build.gradle ajouter la publication dans nexus :
 ```
 apply plugin: "maven-publish"
 [...]
+group = 'laravel-kingoludo'
+
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact source: tarball, extension: 'zip'
+        maven(MavenPublication) {
+            artifact source: packageDistribution, extension: 'zip'
         }
     }
     repositories {
@@ -77,13 +69,23 @@ publishing {
     }
 }
 ```
-* Lancer la publication
+* Quelques explications sur la tache ci-dessus :
+* * Pour publier il est obligatoire de donner un nom à un group de projet (le nom de votre choix ici laravel-kingoludo)
+* * La partie suivante définie les options pour la publication 
+* * publication définit le type de publication et la source (le fichier à déployer)
+* * repositories définit la destination avec les informations de connexions et l'url (qui sont récupérés dans le gradle.properties)
+* Modifier le Dockerfile pour appeler la tache publish
+* Lancer la publication via le build de docker
 ```
-gradle publishing
+docker-compose up --build
 ```
+* Vérifier dans nexus que votre archive zip a bien été publiée :)
 
 ## Utilisation de nexus sur votre propre projet
-* Créer les repository (hosted et proxy) ainsi qu'un groupe pour votre propre projet dans nexus
-* Paramètrer le repository en ajoutant si nécessaire un ou plusieurs plugins
-* Adapter le build.gradle pour utiliser le repository proxy pour récupérer vos dépendances
+* Créer le repository (hosted) pour votre propre projet dans nexus
+* Paramètrer le repository 
 * Publier votre artifact dans nexus depuis gradle
+
+## Pour aller plus loin (si vous avez le temps ou à faire plus tard)
+* Mettre en place un repository proxy sur nexus qui va récupérer vos dépendances
+* Utiliser ce repository proxy pour récupérer vos dépendances dans votre script gradle
