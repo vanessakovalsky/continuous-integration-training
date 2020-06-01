@@ -1,0 +1,24 @@
+version: '3'
+services:
+  # gradle:
+  #   build: ./
+  #   #image: gradle
+  #   container_name: gradle
+  jenkins:
+    ports: 
+      - "8098:8080"
+      - "50000:50000"
+    image: jenkins/jenkins
+    volumes:
+      - jenkins_home:/var/jenkins_home
+  nexus:
+    volumes:
+      - nexus-data:/nexus-data
+    #Avoid conflict with macAffee which using port 8081 and 8082
+    ports:
+      - "8099:8081"
+    image: sonatype/nexus3
+    container_name: nexus
+volumes:
+  nexus-data: {}
+  jenkins_home: {}
