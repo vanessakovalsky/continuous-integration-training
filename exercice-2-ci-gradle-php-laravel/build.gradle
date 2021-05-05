@@ -32,10 +32,11 @@ task composer(type:Exec, dependsOn: purge) {
 task vendor(type:Exec, dependsOn: composer) {
   //println 'Installing dependencies'
   executable 'sh'
-  args '-c', 'php composer.phar install'
+  args '-c', 'php composer.phar update'
   standardOutput = new ByteArrayOutputStream()
   ext.output = { return standardOutput.toString() }
 }
+
 
 def tarfile = "application-" + version
 task packageDistribution(type: Zip, dependsOn: vendor) {

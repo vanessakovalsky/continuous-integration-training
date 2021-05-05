@@ -65,7 +65,7 @@ task composer(type:Exec, dependsOn: purge) {
 task vendor(type:Exec, dependsOn: composer) {
   //println 'Installing dependencies'
   executable 'sh'
-  args '-c', 'php composer.phar install'
+  args '-c', 'php composer.phar update'
   standardOutput = new ByteArrayOutputStream()
   ext.output = { return standardOutput.toString() }
 }
@@ -88,6 +88,7 @@ task packageDistribution(type: Zip, dependsOn: vendor) {
     from { 'server.php' }
     archiveFileName = tarfile + ".zip"
     destinationDirectory = file("build")
+}
 ```
 * Si on détaille un peu ce fichier :
 * * apply plugin permet d'aller chercher le plugin de gradle qui permet de packager

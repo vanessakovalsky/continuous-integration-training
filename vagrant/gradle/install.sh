@@ -28,4 +28,4 @@ source /etc/profile.d/gradle.sh
 
 ## Ajout de PHP pour l'exemple : 
 
-sudo apt install php php-mbstring php-dom
+sudo apt install -y php php-mbstring php-dom
