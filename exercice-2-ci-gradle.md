@@ -11,6 +11,11 @@ Il est possible de faire ses exercices soit dans des conteneurs (voir docker ci-
 https://docs.docker.com/get-docker/
 * Installer docker-compose :
 https://docs.docker.com/compose/install/ 
+* Récupérer le fichier DockerFile
+* Build et Lancement du conteneur docker:
+```
+docker build --tag my-gradle .
+```
 
 ### Vagrant
 
@@ -22,10 +27,6 @@ https://docs.docker.com/compose/install/
 * Si ce n'est pas fait récupérer le code source de votre projet, ici :
 ```
 git clone https://github.com/vanessakovalsky/laravel-kingoludo.git project
-```
-* Build et Lancement du conteneur docker:
-```
-docker build --tag my-gradle .
 ```
 * Dans votre IDE, créer à la racine du projet un fichier build.gradle contenant :
 ```
@@ -106,9 +107,9 @@ task tarball(type:Exec, dependsOn: vendor, applicationDistTar) {
     [...]
 }
 ```
-* Mofidier le fichier Docker file pour appeler seulement la dernière tache :
+*Lancer seulement la dernière tache dans votre environnement :
 ```
-RUN gradle tarball --no-demon --info
+gradle tarball --no-demon --info
 ```
 * Pour découvrir l'ensemble des options, aller voir la documentation de gradle :
 https://docs.gradle.org/current/userguide/userguide.html 
