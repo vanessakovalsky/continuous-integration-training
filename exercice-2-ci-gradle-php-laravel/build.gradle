@@ -1,5 +1,6 @@
 buildscript {
   repositories {
+    gradlePluginPortal()
     maven {
       url "https://plugins.gradle.org/m2/"
     }
@@ -21,28 +22,36 @@ task purge(type:Delete) {
   delete 'vendor', 'logs', 'build'
 }
 
-task installDeps(type: org.swissphpfriends.gradle.task.ComposerInstall) {
-    workingDirectory = "./project"
-    doNotUpdatePhar = true
+task composer(type:Exec, dependsOn: purge) {
+  //println 'Setting up dependencies'
+  executable 'sh'
+  args '-c', 'php -r "readfile(\'https://getcomposer.org/installer\');" | php'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
+}
+task vendor(type:Exec, dependsOn: composer) {
+  //println 'Installing dependencies'
+  executable 'sh'
+  args '-c', 'php composer.phar install'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
 }
 
-
 def tarfile = "application-" + version
-task packageDistribution(type: Zip, dependsOn: installDeps) {
-    archiveFileName = tarfile + ".zip"
-    destinationDirectory = file("project/build")
-
-    from ('project/app') { into 'app' }
-    from ('project/bootstrap') { into 'bootstrap' }
-    from ('project/config') { into 'config' }
-      from ('project/database') { into 'database' }
-      from ('project/nbproject') { into 'nbproject' }
-      from ('project/public') { into 'public' }
-      from ('project/resources') { into 'resources' }
-      from ('project/storage') {
+task packageDistribution(type: Zip, dependsOn: vendor) {
+    from ('app') { into 'app' }
+    from ('bootstrap') { into 'bootstrap' }
+    from ('config') { into 'config' }
+    from ('database') { into 'database' }
+    from ('nbproject') { into 'nbproject' }
+    from ('public') { into 'public' }
+    from ('resources') { into 'resources' }
+    from ('storage') {
         into 'storage'
         dirMode 0775
       }
-      from ('project/vendor') { into 'vendor' }
-      from { 'project/server.php' }
+    from ('vendor') { into 'vendor' }
+    from { 'server.php' }
+    archiveFileName = tarfile + ".zip"
+    destinationDirectory = file("build")
 }

@@ -73,23 +73,21 @@ task vendor(type:Exec, dependsOn: composer) {
 
 def tarfile = "application-" + version
 task packageDistribution(type: Zip, dependsOn: vendor) {
-    archiveFileName = tarfile + ".zip"
-    destinationDirectory = file("project/build")
-
-    from ('project/app') { into 'app' }
-    from ('project/bootstrap') { into 'bootstrap' }
-    from ('project/config') { into 'config' }
-      from ('project/database') { into 'database' }
-      from ('project/nbproject') { into 'nbproject' }
-      from ('project/public') { into 'public' }
-      from ('project/resources') { into 'resources' }
-      from ('project/storage') {
+    from ('app') { into 'app' }
+    from ('bootstrap') { into 'bootstrap' }
+    from ('config') { into 'config' }
+    from ('database') { into 'database' }
+    from ('nbproject') { into 'nbproject' }
+    from ('public') { into 'public' }
+    from ('resources') { into 'resources' }
+    from ('storage') {
         into 'storage'
         dirMode 0775
       }
-      from ('project/vendor') { into 'vendor' }
-      from { 'project/server.php' }
-}
+    from ('vendor') { into 'vendor' }
+    from { 'server.php' }
+    archiveFileName = tarfile + ".zip"
+    destinationDirectory = file("build")
 ```
 * Si on détaille un peu ce fichier :
 * * apply plugin permet d'aller chercher le plugin de gradle qui permet de packager
