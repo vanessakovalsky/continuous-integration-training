@@ -30,23 +30,39 @@ git clone https://github.com/vanessakovalsky/laravel-kingoludo.git project
 ```
 * Dans votre IDE, créer à la racine du projet un fichier build.gradle contenant :
 ```
+
+buildscript {
+  repositories {
+    gradlePluginPortal()
+    maven {
+      url "https://plugins.gradle.org/m2/"
+    }
+  }
+  dependencies {
+    classpath "gradle.plugin.org.swissphpfriends:php-build-plugin:0.1-SNAPSHOT"
+  }
+}
+
+apply plugin: "org.hasnat.php-build-plugin"
 apply plugin: "distribution"
+
 def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
 def minorVersion = System.getenv("MINOR_VERSION") ?: "0"
 version = majorVersion + "." + minorVersion 
 
-task purge << {
+task purge(type:Delete) {
   //println 'Cleaning up old files'
-  delete 'vendor', 'logs', 'build', 'composer.phar'
+  delete 'vendor', 'logs', 'build'
 }
-task composer(type:Exec) {
+
+task composer(type:Exec, dependsOn: purge) {
   //println 'Setting up dependencies'
   executable 'sh'
   args '-c', 'php -r "readfile(\'https://getcomposer.org/installer\');" | php'
   standardOutput = new ByteArrayOutputStream()
   ext.output = { return standardOutput.toString() }
 }
-task vendor(type:Exec) {
+task vendor(type:Exec, dependsOn: composer) {
   //println 'Installing dependencies'
   executable 'sh'
   args '-c', 'php composer.phar install'
@@ -54,31 +70,25 @@ task vendor(type:Exec) {
   ext.output = { return standardOutput.toString() }
 }
 
-distributions {
-  application {
-    baseName = 'application'
-    contents {
-      from ('app') { into 'app' }
-      from ('bootstrap') { into 'bootstrap' }
-      from ('config') { into 'config' }
-      from ('database') { into 'database' }
-      from ('nbproject') { into 'nbproject' }
-      from ('public') { into 'public' }
-      from ('resources') { into 'resources' }
-      from ('storage') {
+
+def tarfile = "application-" + version
+task packageDistribution(type: Zip, dependsOn: vendor) {
+    archiveFileName = tarfile + ".zip"
+    destinationDirectory = file("project/build")
+
+    from ('project/app') { into 'app' }
+    from ('project/bootstrap') { into 'bootstrap' }
+    from ('project/config') { into 'config' }
+      from ('project/database') { into 'database' }
+      from ('project/nbproject') { into 'nbproject' }
+      from ('project/public') { into 'public' }
+      from ('project/resources') { into 'resources' }
+      from ('project/storage') {
         into 'storage'
         dirMode 0775
       }
-      from ('vendor') { into 'vendor' }
-      from { 'server.php' }
-    }
-  }
-}
-def tarfile = "build/distributions/application-" + version
-task tarball(type:Exec) {
-  //println 'Compressing tar'
-  executable 'sh'
-  args '-c', "gzip -f < " + tarfile + ".tar > " + tarfile + ".tgz"
+      from ('project/vendor') { into 'vendor' }
+      from { 'project/server.php' }
 }
 ```
 * Si on détaille un peu ce fichier :
@@ -103,13 +113,13 @@ task vendor(type:Exec, dependsOn: composer) {
     [...]
 }
 [...]
-task tarball(type:Exec, dependsOn: vendor, applicationDistTar) {
+task packageDistribution(type: Zip, dependsOn: vendor) {
     [...]
 }
 ```
 *Lancer seulement la dernière tache dans votre environnement :
 ```
-gradle tarball --no-demon --info
+gradle packageDistribution --no-demon --info
 ```
 * Pour découvrir l'ensemble des options, aller voir la documentation de gradle :
 https://docs.gradle.org/current/userguide/userguide.html 

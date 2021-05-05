@@ -25,3 +25,7 @@ echo "export PATH=/opt/gradle/latest/bin:${PATH}" > /etc/profile.d/gradle.sh
 chmod +x /etc/profile.d/gradle.sh
 
 source /etc/profile.d/gradle.sh
+
+## Ajout de PHP pour l'exemple : 
+
+sudo apt install php php-mbstring php-dom
