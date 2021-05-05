@@ -3,12 +3,20 @@
 Cet exercice a pour but de vous faire manipuler Gradle, et notamment de créer le fichiers builds nécessaires à la construction de votre projet
 
 ## Pré-requis
+Il est possible de faire ses exercices soit dans des conteneurs (voir docker ci-dessous) soit dans des VM vagrant (voir Vagrant ci-dessous) soit d'installer les outils en local (voir les sites officiels pour les procédures d'installation)
 
+### Docker
 * Afin d'éviter les installations trop nombreuses, nous allons utiliser docker et docker compose
 * Installer docker :
 https://docs.docker.com/get-docker/
 * Installer docker-compose :
 https://docs.docker.com/compose/install/ 
+
+### Vagrant
+
+* Récupérer le fichier VagrantFile et install.sh qui se trouve dans le dossier vagrant/gradle
+* Installer Vagrant : https://www.vagrantup.com/ 
+* Dans un terminal se positionner dans le dossier contenant les deux fichiers récupérer et lancer la commande : ```vagrant up```
 
 ## Exemple de build avec un projet PHP
 * Si ce n'est pas fait récupérer le code source de votre projet, ici :
