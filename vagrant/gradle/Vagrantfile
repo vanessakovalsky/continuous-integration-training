@@ -11,4 +11,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Shared folder
   config.vm.synced_folder "project/", "/home/project", create: true
+ 
+
+
 end
+

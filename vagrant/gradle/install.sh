@@ -18,5 +18,10 @@ ln -s /opt/gradle/gradle-${VERSION} /opt/gradle/latest
 
 # Ajout de gradle au PATH
 
-export GRADLE_HOME=/opt/gradle/latest
-export PATH=${GRADLE_HOME}/bin:${PATH}
+touch /etc/profile.d/gradle.sh
+
+echo "export PATH=/opt/gradle/latest/bin:${PATH}" > /etc/profile.d/gradle.sh
+
+chmod +x /etc/profile.d/gradle.sh
+
+source /etc/profile.d/gradle.sh
