@@ -1,17 +1,8 @@
-buildscript {
-  repositories {
-    maven {
-      url "https://plugins.gradle.org/m2/"
-    }
-  }
-  dependencies {
-    classpath "gradle.plugin.org.swissphpfriends:php-build-plugin:0.1-SNAPSHOT"
-  }
+plugins {
+  id "org.hasnat.php-build-plugin" version "0.1-SNAPSHOT"
+  id "distribution"
+  id "maven-publish"
 }
-
-apply plugin: "org.hasnat.php-build-plugin"
-apply plugin: "distribution"
-apply plugin: "maven-publish"
 
 def majorVersion = System.getenv("MAJOR_VERSION") ?: "1"
 def minorVersion = System.getenv("MINOR_VERSION") ?: "0"
@@ -19,54 +10,67 @@ version = majorVersion + "." + minorVersion
 
 task purge(type:Delete) {
   //println 'Cleaning up old files'
-  delete 'vendor', 'logs', 'build'
+  delete 'vendor', 'logs', 'build/*.zip'
 }
 
-task installDeps(type: org.swissphpfriends.gradle.task.ComposerInstall) {
-    workingDirectory = "./project"
-    doNotUpdatePhar = true
+task composer(type:Exec, dependsOn: purge) {
+  //println 'Setting up dependencies'
+  executable 'sh'
+  args '-c', 'php -r "readfile(\'https://getcomposer.org/installer\');" | php'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
 }
 
+task vendor(type:Exec, dependsOn: composer) {
+  //println 'Installing dependencies'
+  executable 'sh'
+  args '-c', 'php composer.phar install'
+  standardOutput = new ByteArrayOutputStream()
+  ext.output = { return standardOutput.toString() }
+}
 
-def tarfile = "application-" + version
-task packageDistribution(type: Zip, dependsOn: installDeps) {
-    archiveFileName = tarfile + ".zip"
-    destinationDirectory = file("project/build")
-
-    from ('project/app') { into 'app' }
-    from ('project/bootstrap') { into 'bootstrap' }
-    from ('project/config') { into 'config' }
-      from ('project/database') { into 'database' }
-      from ('project/nbproject') { into 'nbproject' }
-      from ('project/public') { into 'public' }
-      from ('project/resources') { into 'resources' }
-      from ('project/storage') {
+def tarfile = "project-" + version
+task packageDistribution(type: Zip, dependsOn: vendor) {
+    from ('app') { into 'app' }
+    from ('bootstrap') { into 'bootstrap' }
+    from ('config') { into 'config' }
+    from ('database') { into 'database' }
+    from ('nbproject') { into 'nbproject' }
+    from ('public') { into 'public' }
+    from ('resources') { into 'resources' }
+    from ('storage') {
         into 'storage'
         dirMode 0775
       }
-      from ('project/vendor') { into 'vendor' }
-      from { 'project/server.php' }
+    from ('vendor') { into 'vendor' }
+    from { 'server.php' }
+    archiveFileName = tarfile + ".zip"
+    destinationDirectory = file("build")
 }
 
-group = 'laravel-kingoludo'
+// task up(type:Exec, dependsOn: packageDistribution) {
+//   executable 'sh'
+//   args '-c', 'curl -v --user "admin:Formation2021*" --upload-file build/application-1.0.zip http://192.168.1.12:8081/repository/ArchiveZip/application-php/project/1.0/application-1.0.zip'
+//   standardOutput = new ByteArrayOutputStream()
+//   ext.output = { return standardOutput.toString() }
+// }
 
-publishing {
-    publications {
-        maven(MavenPublication) {
+  publishing {
+      publications {
+          maven(MavenPublication) {
             artifact source: packageDistribution, extension: 'zip'
-        }
-    }
-    repositories {
-        maven {
-            //credentials {
-            //    username nexusUsername
-            //    password nexusPassword
-            //}
-            url nexusRepo
-        }
-    }
-}
+          }
+      }
+      repositories {
+          maven {
+              url nexusRepo 
+              allowInsecureProtocol true
+              credentials {
+                  username nexusUsername
+                  password nexusPassword
+              }
+          }
+      }
 
-assemble.dependsOn packageDistribution
-   build.dependsOn assemble
- publish.dependsOn build
+
+  }
