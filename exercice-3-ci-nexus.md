@@ -4,6 +4,8 @@ Cet exercice a pour but de mettre en place et configurer nexus.
 Puis d'intégrer le dépôt nexus à la fois pour récupérer des paquets comme proxy, mais aussi pour déposer les paquets produit par le build de gradle
 
 ## Mise en place de nexus
+Lire le paragraphe qui concerne votre environnement (Docker ou Vagrant)
+### Docker
 * Récupérer le fichier docker-compose.yml dans exercice-3-ci-nexus et placer le dans votre dossier de travail
 * Lancer le docker compose (depuis le dossier de travail)
 ```
@@ -29,6 +31,23 @@ docker exec -t -i nexus sh
 cat nexus-data/admin.password
 ```
 * Noter le mot de passe afficher
+* Il est indispensable de récupérer l'IP du container Nexus, pour cela on utilise docker network inspect qui permet d'avoir des informations sur le réseau :
+```
+docker network inspect 
+```
+
+### Vagrant
+* Récupérer le Vagrantfile et le fichier install.sh dans le dossier vagrant/nexus de ce dépôt
+* Ouvrir un terminal et se positionner dans le dossier contenant les deux fichiers que l'on vient de récupérer puis lancer un ```vagrant up```
+* Choisir votre interface réseau
+* Patientez le temps que la VM démarre
+* Une fois la VM démarré en dernier, vous devriez avoir le mot de passe admin affiché, si ce n'est pas le cas : 
+* COnnexter vous sur la VM (vagrant ssh)
+* Aller afficher le mot de passe qui se trouve dans : /opt/nexus/sonatype-work/nexus3/admin.password
+* Noter le mot de passe
+* Aller sur http://192.168.0.44 
+
+## Configuration (pour tous les environnements)
 * Se connecter (login : admin, pass : (récupérer à l'étape précédente))
 * Suivre les 4 étapes de configuration
 * Quels sont les différents repositories existants ?
@@ -36,12 +55,9 @@ cat nexus-data/admin.password
 
 ## Utilisation de nexus sur un projet PHP
 * Nous allons utiliser notre repository pour publier les archives de notre application
-* Il est indispensable de récupérer l'IP du container Nexus, pour cela on utilise docker network inspect qui permet d'avoir des informations sur le réseau :
-```
-docker network inspect 
-```
+
 * Dans les lignes affichés, on cherche Nexus et la ligne contenant IP/V4
-* Créer un fichier gradle.properties à la racine du projet, il contient les informations de connexion
+* Créer un fichier gradle.properties à la racine du projet, il contient les informations de connexion (adapter l'IP à votre environnement)
 ```
 # Maven repository for publishing artifacts
 nexusRepo=172.22.0.3:8081/repository/maven-releases/
@@ -75,9 +91,9 @@ publishing {
 * * publication définit le type de publication et la source (le fichier à déployer)
 * * repositories définit la destination avec les informations de connexions et l'url (qui sont récupérés dans le gradle.properties)
 * Modifier le Dockerfile pour appeler la tache publish
-* Lancer la publication via le build de docker
+* Lancer la publication dans le conteneur ou la vm
 ```
-docker-compose up --build
+gradle build
 ```
 * Vérifier dans nexus que votre archive zip a bien été publiée :)
 
