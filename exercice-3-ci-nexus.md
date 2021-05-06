@@ -5,6 +5,7 @@ Puis d'intégrer le dépôt nexus à la fois pour récupérer des paquets comme 
 
 ## Mise en place de nexus
 Lire le paragraphe qui concerne votre environnement (Docker ou Vagrant)
+
 ### Docker
 * Récupérer le fichier docker-compose.yml dans exercice-3-ci-nexus et placer le dans votre dossier de travail
 * Lancer le docker compose (depuis le dossier de travail)
@@ -69,18 +70,21 @@ apply plugin: "maven-publish"
 group = 'laravel-kingoludo'
 
 publishing {
-    publications {
-        maven(MavenPublication) {
-            artifact source: packageDistribution, extension: 'zip'
-        }
-    }
     repositories {
         maven {
-            credentials {
-                username nexusUsername
-                password nexusPassword
-            }
             url nexusRepo
+            allowInsecureProtocol = true
+            credentials {
+                username = nexusUsername
+                password = nexusPassword
+            }
+        }
+    }
+
+    publications {
+        maven(MavenPublication) {
+            artifact packageDistribution
+           
         }
     }
 }
@@ -89,11 +93,11 @@ publishing {
 * * Pour publier il est obligatoire de donner un nom à un group de projet (le nom de votre choix ici laravel-kingoludo)
 * * La partie suivante définie les options pour la publication 
 * * publication définit le type de publication et la source (le fichier à déployer)
-* * repositories définit la destination avec les informations de connexions et l'url (qui sont récupérés dans le gradle.properties)
-* Modifier le Dockerfile pour appeler la tache publish
+* * repositories définit la destination avec les informations de connexions et l'url (qui sont récupérés dans le gradle.properties à adapter avec vos informations)
 * Lancer la publication dans le conteneur ou la vm
 ```
-gradle publishing
+gradle generatePomFileForMavenPublication
+gradle publish
 ```
 * Vérifier dans nexus que votre archive zip a bien été publiée :)
 
