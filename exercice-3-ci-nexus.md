@@ -93,7 +93,7 @@ publishing {
 * Modifier le Dockerfile pour appeler la tache publish
 * Lancer la publication dans le conteneur ou la vm
 ```
-gradle build
+gradle publishing
 ```
 * Vérifier dans nexus que votre archive zip a bien été publiée :)
 
