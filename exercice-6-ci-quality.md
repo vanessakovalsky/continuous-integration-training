@@ -17,7 +17,7 @@ Cet exercice a pour objectifs :
 
 ```
 * NB : le fichier buid.gradle a été ajouté au dépôt source laravel-kingdomino puisqu'il est lié à ce projet
-* NB2 : pour executer ce script, il est nécessaire que les outils utilisés soient installés sur la machine (pour l'éxecuter en local, il faudra donc modifier le dockerfile pour installer ces outils, ce n'est pas fait dans cet exemple)
+* NB2 : pour executer ce script, il est nécessaire que les outils utilisés soient installés sur la machine (pour l'éxecuter en local, il faudra donc modifier l'environnement d'execution de gradle pour installer ces outils, ce n'est pas fait dans cet exemple)
 
 ## Intégrer l'analyse qualité à notre job Jenkins
 * Dans le build de notre projet, ajouter les étapes correspondantes au script gradle :

@@ -7,7 +7,9 @@ Cet exercice a pour objectif :
 * * de construire un paquet et de le déployer sur Nexus
 
 ## Pré-requis 
-* un serveur jenkins a été créé pour la formation et est accessible à l'adresse : XXX
+L'accès à un serveur Jenkins est nécessaire. Vous pouvez l'installer en local soit avec Docker, soit avec Vagrant 
+
+### Docker
 * il est également possible de lancer un jenkins en local à l'aide du docker compose du dossier exercice-5-ci-jenkins avec la commande :
 ```
 docker-compose up -d
@@ -15,10 +17,20 @@ docker-compose up -d
 * Un serveur jenkins et un serveur nexus sont alors lancés sur deux conteneurs
 * Il est nécessaire de configurer jenkins
 * Pour cela aller à l'adresse : http//localhost:8098 
+
+### Vagrant
+* Récupérer le Vagrantfile et le install.sh dans vagrant/jenkins sur ce dépôt
+* Configurer l'adresse ip du vagrant file pour qu'elle soit utilisable sur votre réseau
+* Lancer le vagrant depuis le dossier où se trouve les fichiers avec ```vagrant up```
+* Accéder depuis votre hôte au jenkins sur localhot:8014 ou bien depuis l'adresse IP publique configurée dans le vagrant file sur le port 8080
+
+## Configuration du Jenkins
 * Récupérer le mot de passe initial de l'admin à l'aide du chemin fourni
 * Configurer les plugins (vous pouvez laisser les plugins recommandés)
 * Configurer votre compte admin
 * Vous êtes prêt à utiliser votre jenkins :) 
+
+
 
 ## Configurer le premier job 
 * Une fois connecter Jenkins vous propose de créer un job (si des jobs existent, utiliser le menu Add new item) 
