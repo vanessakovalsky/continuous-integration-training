@@ -14,7 +14,47 @@ Cet exercice a pour objectifs :
 * * phpcs : permet d'analyser le code et de détecter les écarts avec les normes de codage
 * Nous allons donc ajouter l'appel à ces différents outils dans notre build.gradle :
 ```
+task phploc(type: Exec, description: 'Measure project size using PHPLOC') {
+	executable 'sh'
+	args '-c',"/home/ubuntu/tools/phploc --count-tests \
+    --log-csv='./build/reports/phploc.csv' \
+    --log-xml='./build/reports/phploc.xml' \
+     ./app"
+}
 
+task phpmd (type : Exec, description : "Perform project mess detection using PHPMD, and Creating a log file for the Continuous Integration Server"){
+	executable 'sh'
+	args '-c',"/home/ubuntu/tools/phpmd ./app \
+    xml './phpmd.xml' \
+    --reportfile './build/reports/phpmd.xml'\
+    --ignore-violations-on-exit"
+}
+
+task phpcpd (type : Exec, description : "Find duplicate code using PHPCPD and log result in XML format."){
+	executable 'sh'
+	args '-c',"/home/ubuntu/tools/phpcpd \
+    --log-pmd './build/reports/pmd-cpd.xml' \
+    ./app"
+}
+
+task phpcs (type : Exec, description : "Find Coding Standard Violations using PHP_CodeSniffer"){
+	executable 'sh'
+	args '-c',"/home/ubuntu/tools/phpcs \
+    --report=checkstyle \
+    --report-file='./build/reports/checkstyle.xml' \
+    --standard=PSR2 \
+    --extensions=php \
+    --ignore=autoload.php \
+    --runtime-set ignore_errors_on_exit 1 \
+    --runtime-set ignore_warnings_on_exit 1 \
+    ./app/"
+}
+
+task phpdox (type : Exec, description : "Generating Docs enriched with pmd, checkstyle, phpcs,phpunit,phploc"){
+	executable 'sh'
+	args '-c',"/home/ubuntu/tools/phpdox \
+    -f ./phpdox.xml"
+}
 ```
 * NB : le fichier buid.gradle a été ajouté au dépôt source laravel-kingdomino puisqu'il est lié à ce projet
 * NB2 : pour executer ce script, il est nécessaire que les outils utilisés soient installés sur la machine (pour l'éxecuter en local, il faudra donc modifier l'environnement d'execution de gradle pour installer ces outils, ce n'est pas fait dans cet exemple)
