@@ -11,9 +11,17 @@ Il est possible de faire ses exercices soit dans des conteneurs (voir docker ci-
 https://docs.docker.com/get-docker/
 * Installer docker-compose :
 https://docs.docker.com/compose/install/ 
-* Récupérer le fichier DockerFile
+* Récupérer le fichier DockerFile : 
+```
+git clone https://github.com/vanessakovalsky/continuous-integration-training.git
+```
+* Récupérer le projet : 
+```
+git clone https://github.com:vanessakovalsky/laravel-kingoludo.git
+```   
 * Build et Lancement du conteneur docker:
 ```
+cd 
 docker build --tag my-gradle .
 ```
 
