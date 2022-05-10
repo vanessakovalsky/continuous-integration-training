@@ -62,6 +62,8 @@ docker network inspect
 ```
 # Maven repository for publishing artifacts
 nexusRepo=172.22.0.3:8081/repository/maven-releases/
+nexusUsername=admin
+nexusPassword=VotrePassword
 ```
 * Dans le build.gradle ajouter la publication dans nexus :
 ```
