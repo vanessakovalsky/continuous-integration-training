@@ -18,7 +18,7 @@ git clone https://github.com/vanessakovalsky/continuous-integration-training.git
 * Récupérer le projet : 
 ```
 cd exercice-2-ci-gradle-php-laravel
-git clone https://github.com:vanessakovalsky/laravel-kingoludo.git
+git clone https://github.com/vanessakovalsky/laravel-kingoludo.git
 ```   
 * Build et Lancement du conteneur docker:
 ```
