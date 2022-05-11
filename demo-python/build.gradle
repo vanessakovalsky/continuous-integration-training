@@ -1,0 +1,23 @@
+task purge(type:delete){
+    delete 'build'
+}
+
+task dependance(type:Exec, dependsOn:purge){
+    executable 'sh'
+    args '-c', 'pip install -r src/requirements.txt'
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = { return standardOutput.toString() }
+}
+
+task test(type:Exec, dependsOn:dependance){
+    executable 'sh'
+    args '-c', 'python3 -m pytest src/tests.py'
+    standardOutput = new ByteArrayOutputStream()
+    ext.output = { return standardOutput.toString() }
+}
+
+task packageApp(type:Zip, dependsOn:test){
+    from('src') into ('.')
+    archiveFileName = 'demo-python.zip'
+    destinationDirectory = file('build')
+}
